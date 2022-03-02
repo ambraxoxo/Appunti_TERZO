@@ -1,10 +1,12 @@
 \documentclass{article}
 \usepackage{algorithm}
+\usepackage{amsmath}
 \usepackage{algpseudocode}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
-
-
+\newtheorem{definizione}{Definizione}
+\newtheorem{theorem}{Teorema}
+\newtheorem{corollary}{Corollario}
 \title{Introduzione all'Intelligenza Artificiale 2022}
 \author{Ambra Manattini}
 \date{February 2022}
@@ -321,9 +323,16 @@ Un nodo n è una struttura dati con 4 componenti
 \end{itemize}
 \subsubsection{Valutazione di una strategia}
 \begin{itemize}
-    \item Completez
+    \item Completezza: se la soluzione esiste viene trovata
+    \item Ottimalità (ammissibilità): trova la soluzione migliore, con costo minore
+    \item Complessità in tempo
+    \item Complessità in spazio
+    
 \end{itemize}
 
+\subsection{Direzione della ricerca}
+\textbf{Ricerca in avanti}: (o guidata dai dati) si esplora lo spazio di ricerca dallo stato iniziale allo stato obiettivo
+\newline\textbf{Ricerca all'indietro}: (o guidata dall'obiettivo) si esplora lo spazio di ricerca a partire da uno stato goal e riconducendosi a sotto-goal fino a trovare uno stato iniziale.
 
 
 \section{Ricerca euristica}
@@ -331,12 +340,123 @@ La ricerca esaustiva è difficilmente applicabile in problemi di complessità es
 La conoscenza euristica consente di trovare una buona soluzione in tempi accettabili
 
 \subsection{Funzioni di valutazione euristica}
-Conoscenza del problema data tramite una \textit{funzione di valutazione} \ f\  
+Conoscenza del problema data tramite una \textit{funzione di valutazione f} che include \textit{h} detta funzione di valutazione euristica
+\newline $h : n \rightarrow R$
+\newline La funzione si applica al nodo ma dipende solo dallo stato (n.Stato)
+\begin{figure}
+    \begin{equation}
+        f(n) = g(n) + h(n)
+    \end{equation}
+\caption{dove g(n) è il costo del cammino visto con UC}
+\end{figure}
 %manca descrizione
 
 \subsection{Algoritmo di ricerca Best-First}
-%descrizione algoritmo
-\subsubsection{Greedy Best-First}
-\subsection{Algoritmo di tipo A}
-Un algoritmo A è un algo
+Con lo stesso algoritmo di UC, ma con uso di $f$ (stima di costo) per la coda con priorità. La scelta di $f$ determina la strategia di ricerca.
+
+A ogni passo si sceglie il nodo sulla frontiera per cui il valore della $f$ è migliore. In caso di un'euristica che stima la distanza della soluzione migliore significa minore $f<h$, nel caso \textbf{greedy best-first} si usa $f=h$
+
+\subsection{Algoritmo A}
+Un algoritmo A è un algoritmo Best First con una funzione di valutazione dello stato del tipo
+\begin{equation}
+    f(n) = g(n) + h(n),\quad con\,h(n) \geq 0 \,\, e \,\, h(goal) = 0
+\end{equation}
+\begin{center}
+    \begin{itemize}
+        \item $g(h)$ è il costo del cammino percorso per raggiungere $n$
+        \item $h(n)$ una stima del costo per raggiungere da $n$ un nodo goal
+    \end{itemize}
+\end{center}
+
+\subsection{Algoritmo A*}
+Funzione di valutazione ideale
+\begin{equation}
+    f\text{*}(n) = g\text{*}(n) + h\text{*}(n)
+\end{equation}
+\begin{center}
+    $g\text{*}(n)$ costo del cammino minimo da radice $n$\newline
+    $h\text{*}(n)$ costo del cammino minimo da $n$ a goal\newline
+    $f\text{*}(n)$ costo del cammino minimo da radice a goal, attraverso $n$
+\end{center}
+\subsubsection{Algoritmo A*: definizione}
+
+\begin{definizione}[Euristica ammissibile]
+%\begin{center}
+$\forall n.h(n) \leq h\text{*}(n)$ \quad $h$ è una sottostima
+%\end{center} 
+\end{definizione}
+\begin{center} \textit{(es. l'euristica della distanza in linea d'aria)}\end{center}
+\begin{definizione}[Algoritmo A*]
+Un algoritmo A in cui $h$ è una funzione euristica ammissibile
+\end{definizione}
+\begin{theorem}
+Gli algoritmi A* sono \textit{ottimali}
+\end{theorem}
+\begin{corollary}
+BF$^{(+)}$ e UC sono ottimali $(h(n)=0$
+\end{corollary}
+
+\section{Ricerca Locale}
+Gli algoritmi visti esplorano gli spazi di ricerca alla ricerca di un goal e restituiscono un \textbf{cammino soluzione}. A volte lo stato goal è la soluzione del problema. 
+
+Gli algoritmi di ricerca locale sono adatti per problemi in cui:
+\begin{itemize}
+    \item La sequenza di azioni non è importante; quello che conta è unicamente lo stato goal
+    \item Tutti gli elementi della soluzione sono nello stato, ma alcuni vincolo sono violati
+\end{itemize}
+\subsection{Proprietà}
+\begin{itemize}
+    \item Non sono sistematici
+    \item Tengono traccia solo del nodo corrente e si spostano su nodi adiacenti
+    \item Non tengono traccia dei cammini
+    \item Efficienti in occupazione di memoria
+    \item Possono trovare soluzioni ragionevoli anche in spazi molto grandi e infiniti (spazi continui)
+    \item Utili per risolvere problemi di ottimizzazione
+    \begin{itemize}
+        \item Lo stato migliore secondo una \textit{funzione obiettivo}
+        \item Lo stato di \textit{costo minore}
+        \item \textit{es: training di un modello di machine learning}
+    \end{itemize}
+\end{itemize}
+\newpage
+\subsection{Panorama dello spazio degli stati}
+Uno stato ha una posizione sulla superficie e una altezza che corrisponde al valore della f. di valutazione (f. obiettivo). Un algoritmo provoca un movimento sulla superficie. 
+Avvallamento più basso $\rightarrow$ costo minimo o picco più alto $\rightarrow$ max di un obiettivo
+
+\begin{figure}[H]
+    \begin{center}
+    \includegraphics[width = \linewidth]{13.png}
+    \caption{f euristica di costo della funzione obiettivo (non del cammino)}
+    \end{center}
+\end{figure}
+\newpage
+\subsection{Ricerca in salita (Hill Climbing)}
+Ricerca locale \textbf{greedy}. Vengono generati i successori e valutati; viene scelto un nodo che migliora la valutazione dello stato attuale \textit{(non si tiene traccia degli altri)} 
+\begin{itemize}
+    \item Il migliore $\rightarrow$ \textit{\textbf{Hill climbing a salita rapida/ripida}}
+    \item Uno a caso (tra quelli che salgono) $\rightarrow$ \textit{\textbf{Hill climbing stocastico}}
+    \item Il primo $\rightarrow$ \textbf{\textit{Hill climbing con prima scelta}}
+\end{itemize}
+\begin{center} Se non ci sono stati successori migliori, l'algoritmo termina con fallimento\end{center}
+
+\begin{algorithm}[H]
+\caption{Algoritmo Hill climbing - steepest ascent}
+  
+        \textbf{function} Hill-climbing (\textit{problema})\newline
+        \null\quad \textbf{returns} uno stato che è un massimo locale\newline
+        \null\quad \textit{nodo-corrente} = CreaNodo(\textit{problema.}Stato iniziale)\newline
+        \null\quad \textbf{loop do}\newline
+        \null\qquad \textit{vicino} = il successori di \textit{nodo-corrente} di valore più alto\newline
+        \null\qquad \textbf{if} \textit{vicino}.Valore $\leq$ \textit{nodo-corrente}.Valore \textbf{then} \textbf{return} \textit{nodo-corrente}.Stato //\textit{interrompe la ricerca}\newline
+        \null\qquad \textit{nodo-corrente} = vicino //altrimenti, se vicino è migliore, continua
+    
+\end{algorithm}
+
+\begin{center}
+    Si prosegue solo se il vicino (più alto) è migliore dello stato corrente $\rightarrow$ se tutti i vicino sono peggiori si ferma.
+    
+    Non c'è frontiera a cui ritornare, si tiene un solo stato
+    
+    Tempo: nuemro cicli variabile in base al punto di partenza
+\end{center}
 \end{document}
